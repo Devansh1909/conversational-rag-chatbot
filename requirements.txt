@@ -1,0 +1,30 @@
+
+# LangChain Framework
+langchain
+langchain-core
+langchain_community
+
+# HuggingFace Integration (Primary)
+langchain-huggingface
+sentence-transformers
+transformers
+huggingface_hub
+
+# OpenAI Integration (Fallback)
+langchain-openai
+
+# Vector Store
+faiss-cpu
+
+# Document Loaders
+docx2txt
+pypdf
+
+# API & Frontend
+fastapi
+uvicorn
+python-multipart
+streamlit
+
+# Utilities
+python-dotenv
