@@ -72,9 +72,12 @@ app.log
 *.sqlite3
 rag_app.db
 
-# ChromaDB vector store
+# Vector store
 chroma_db/
 *.chroma
+faiss_index/
+*.faiss
+*.pkl
 
 # Temporary files
 temp/

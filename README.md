@@ -2,6 +2,8 @@
 
 A **Retrieval-Augmented Generation (RAG)** system built with **LangChain**, **HuggingFace embeddings**, and **FAISS** for contextual document question answering. Features optimized chunking strategies and vector search techniques that improve semantic document retrieval by approximately **~30%**.
 
+> 🌐 **[View Live Showcase →](https://conversational-rag-chatbot.vercel.app)** — Interactive architecture visualization & demo
+
 ---
 
 ## 🧠 Key Skills & Technologies
@@ -49,6 +51,11 @@ RAG-DOCUMENT-QA/
 │   ├── chat_interface.py             # Chat UI component
 │   ├── sidebar.py                    # Model selection + document management
 │   └── api_utils.py                  # FastAPI client utilities
+├── website/                          # Showcase Website (Vercel-deployable)
+│   ├── index.html                    # Single-page architecture showcase
+│   ├── style.css                     # Design system & styles
+│   ├── script.js                     # Animations & interactive demo
+│   └── vercel.json                   # Vercel deployment config
 ├── docs/                             # Sample documents for testing
 ├── documentation/                    # Guides & reference docs
 │   ├── api_reference.md              # API endpoint documentation

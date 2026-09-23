@@ -12,12 +12,16 @@ def display_sidebar():
     # ── Model Selection ──
     st.sidebar.header("⚙️ Model Configuration")
     model_options = [
+        "qwen/qwen3.8-27b",
+        "openai/gpt-oss-120b",
         "google/flan-t5-large",
         "mistralai/Mistral-7B-Instruct-v0.1",
         "gpt-4o-mini",
         "gpt-4o"
     ]
     model_labels = {
+        "qwen/qwen3.8-27b": "⚡ Qwen 3.8-27B (Groq - Fast)",
+        "openai/gpt-oss-120b": "⚡ GPT-OSS 120B (Groq - Fast)",
         "google/flan-t5-large": "🤗 Flan-T5-Large (HuggingFace)",
         "mistralai/Mistral-7B-Instruct-v0.1": "🤗 Mistral-7B-Instruct (HuggingFace)",
         "gpt-4o-mini": "🔑 GPT-4o-mini (OpenAI)",

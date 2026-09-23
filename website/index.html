@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAG Document QA System | LangChain, FAISS, HuggingFace</title>
+  <meta name="description" content="A Retrieval-Augmented Generation pipeline using LangChain, FAISS, and HuggingFace embeddings for contextual document question answering. ~30% improved semantic retrieval." />
+  <meta property="og:title" content="RAG Document QA System" />
+  <meta property="og:description" content="Built with LangChain, FAISS vector search, and HuggingFace embeddings for contextual document question answering." />
+  <meta property="og:type" content="website" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🔍</text></svg>" />
+</head>
+<body>
+
+  <!-- ==================== NAVIGATION ==================== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#" class="nav-logo">
+        <span class="nav-logo-icon">🔍</span>
+        <span>RAG <span class="gradient-text">QA</span></span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="#architecture">Architecture</a>
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#demo">Demo</a>
+        <a href="https://github.com/Devansh1909/conversational-rag-chatbot" target="_blank" rel="noopener" class="nav-github">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO ==================== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <canvas id="hero-canvas"></canvas>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        LangChain + FAISS + HuggingFace
+      </div>
+      <h1>
+        <span class="line">RAG-Based Document</span>
+        <span class="line"><span class="gradient-text">Question Answering</span></span>
+        <span class="line">System</span>
+      </h1>
+      <p class="hero-description">
+        A Retrieval-Augmented Generation pipeline with optimized document chunking 
+        and vector search strategies — improving semantic retrieval by <strong>~30%</strong>.
+      </p>
+      <div class="hero-tech-badges">
+        <span class="tech-badge"><span class="icon">🦜</span> LangChain</span>
+        <span class="tech-badge"><span class="icon">⚡</span> FAISS</span>
+        <span class="tech-badge"><span class="icon">🤗</span> HuggingFace</span>
+        <span class="tech-badge"><span class="icon">🐍</span> Python</span>
+        <span class="tech-badge"><span class="icon">🚀</span> FastAPI</span>
+      </div>
+      <div class="hero-cta">
+        <a href="#architecture" class="btn-primary">
+          Explore Architecture →
+        </a>
+        <a href="https://github.com/Devansh1909/conversational-rag-chatbot" target="_blank" rel="noopener" class="btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View Source
+        </a>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <span>Scroll to explore</span>
+      <span class="arrow"></span>
+    </div>
+  </section>
+
+  <!-- ==================== ARCHITECTURE ==================== -->
+  <section class="section architecture" id="architecture">
+    <div class="container text-center">
+      <h2 class="section-title fade-in"><span class="gradient-text">Architecture</span> Overview</h2>
+      <p class="section-subtitle fade-in">
+        End-to-end RAG pipeline: from document ingestion to contextual answer generation
+      </p>
+
+      <div class="pipeline-container fade-in" id="pipeline">
+        <!-- Ingestion Phase -->
+        <div class="pipeline-label">Document Ingestion Pipeline</div>
+        <div class="pipeline-row">
+          <div class="pipeline-node" data-step="1">
+            <span class="node-icon">📄</span>
+            <span class="node-label">Document Upload</span>
+            <span class="node-detail">PDF, DOCX, HTML, TXT</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-node" data-step="2">
+            <span class="node-icon">✂️</span>
+            <span class="node-label">Chunking</span>
+            <span class="node-detail">chunk_size=500</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-node" data-step="3">
+            <span class="node-icon">🧠</span>
+            <span class="node-label">Embedding</span>
+            <span class="node-detail">all-MiniLM-L6-v2</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-node" data-step="4">
+            <span class="node-icon">⚡</span>
+            <span class="node-label">FAISS Index</span>
+            <span class="node-detail">384-dim vectors</span>
+          </div>
+        </div>
+
+        <!-- Query Phase -->
+        <div class="pipeline-label">Query & Retrieval Pipeline</div>
+        <div class="pipeline-row">
+          <div class="pipeline-node" data-step="5">
+            <span class="node-icon">💬</span>
+            <span class="node-label">User Query</span>
+            <span class="node-detail">+ chat history</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-node" data-step="6">
+            <span class="node-icon">🔄</span>
+            <span class="node-label">Contextualize</span>
+            <span class="node-detail">history-aware</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-node" data-step="7">
+            <span class="node-icon">🔍</span>
+            <span class="node-label">Vector Search</span>
+            <span class="node-detail">cosine similarity</span>
+          </div>
+          <span class="pipeline-arrow">→</span>
+          <div class="pipeline-node" data-step="8">
+            <span class="node-icon">✨</span>
+            <span class="node-label">LLM Answer</span>
+            <span class="node-detail">Flan-T5 / GPT-4o</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FEATURES ==================== -->
+  <section class="section" id="features">
+    <div class="container text-center">
+      <h2 class="section-title fade-in">Key <span class="gradient-text">Features</span></h2>
+      <p class="section-subtitle fade-in">
+        A production-ready RAG system with enterprise-grade capabilities
+      </p>
+      <div class="features-grid stagger-children" id="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon purple">📄</div>
+          <h3>Multi-Format Document Ingestion</h3>
+          <p>Upload PDF, DOCX, HTML, and TXT files. Intelligent format detection with specialized loaders for each document type.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon blue">🤗</div>
+          <h3>HuggingFace Embeddings</h3>
+          <p>Dense 384-dimensional vectors via <code>sentence-transformers/all-MiniLM-L6-v2</code> with cosine similarity normalization.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon cyan">⚡</div>
+          <h3>FAISS Vector Search</h3>
+          <p>Facebook AI Similarity Search for lightning-fast nearest-neighbor retrieval with persistent local index storage.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon green">🧩</div>
+          <h3>Optimized Chunking</h3>
+          <p>Semantic-aware text splitting with hierarchical separators and 500-token chunks with 50-token overlap for ~30% better retrieval.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon amber">💬</div>
+          <h3>Conversational Memory</h3>
+          <p>Context-aware follow-up questions through a history-aware retriever that reformulates queries using chat context.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon pink">🔄</div>
+          <h3>Multi-Model Support</h3>
+          <p>Switch between HuggingFace models (Flan-T5, Mistral-7B) and OpenAI models (GPT-4o) with a single API parameter.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TECH STACK ==================== -->
+  <section class="section tech-stack" id="tech-stack">
+    <div class="container text-center">
+      <h2 class="section-title fade-in">Technology <span class="gradient-text">Stack</span></h2>
+      <p class="section-subtitle fade-in">
+        Built with industry-leading tools and frameworks
+      </p>
+      <div class="tech-grid stagger-children" id="tech-grid">
+        <div class="tech-item">
+          <span class="tech-icon">🦜</span>
+          <span class="tech-name">LangChain</span>
+          <span class="tech-desc">LLM Framework</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">⚡</span>
+          <span class="tech-name">FAISS</span>
+          <span class="tech-desc">Vector Database</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">🤗</span>
+          <span class="tech-name">HuggingFace</span>
+          <span class="tech-desc">Embeddings & LLMs</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">🐍</span>
+          <span class="tech-name">Python 3.9+</span>
+          <span class="tech-desc">Core Language</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">🚀</span>
+          <span class="tech-name">FastAPI</span>
+          <span class="tech-desc">REST Backend</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">📊</span>
+          <span class="tech-name">Streamlit</span>
+          <span class="tech-desc">Frontend UI</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">🗄️</span>
+          <span class="tech-name">SQLite</span>
+          <span class="tech-desc">Chat History DB</span>
+        </div>
+        <div class="tech-item">
+          <span class="tech-icon">🔭</span>
+          <span class="tech-name">LangSmith</span>
+          <span class="tech-desc">Monitoring</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== HOW IT WORKS ==================== -->
+  <section class="section" id="how-it-works">
+    <div class="container text-center">
+      <h2 class="section-title fade-in">How It <span class="gradient-text">Works</span></h2>
+      <p class="section-subtitle fade-in">
+        A deep dive into the RAG pipeline with actual code from the project
+      </p>
+    </div>
+    <div class="container">
+      <div class="steps-container">
+        <!-- Step 1: Document Loading & Chunking -->
+        <div class="step-item fade-in-left">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Document Loading & Optimized Chunking</h3>
+            <p>Documents are loaded with format-specific loaders and split into semantic-aware chunks using hierarchical separators for ~30% improved retrieval accuracy.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span class="code-filename">faiss_utils.py</span>
+              </div>
+              <div class="code-body">
+<pre><span class="cm"># Optimized chunking strategy</span>
+<span class="cls">text_splitter</span> <span class="op">=</span> <span class="fn">RecursiveCharacterTextSplitter</span>(
+    <span class="str">chunk_size</span><span class="op">=</span><span class="num">500</span>,
+    <span class="str">chunk_overlap</span><span class="op">=</span><span class="num">50</span>,
+    <span class="str">separators</span><span class="op">=</span>[<span class="str">"\n\n"</span>, <span class="str">"\n"</span>, <span class="str">". "</span>, <span class="str">" "</span>, <span class="str">""</span>],
+)</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Embedding Generation -->
+        <div class="step-item fade-in-right">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>HuggingFace Embedding Generation</h3>
+            <p>Each chunk is converted to a dense 384-dimensional vector using the <code>all-MiniLM-L6-v2</code> model with normalized cosine similarity for optimal search performance.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span class="code-filename">faiss_utils.py</span>
+              </div>
+              <div class="code-body">
+<pre><span class="cls">embedding_function</span> <span class="op">=</span> <span class="fn">HuggingFaceEmbeddings</span>(
+    <span class="str">model_name</span><span class="op">=</span><span class="str">"sentence-transformers/all-MiniLM-L6-v2"</span>,
+    <span class="str">model_kwargs</span><span class="op">=</span>{<span class="str">"device"</span>: <span class="str">"cpu"</span>},
+    <span class="str">encode_kwargs</span><span class="op">=</span>{<span class="str">"normalize_embeddings"</span>: <span class="kw">True</span>},
+)</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: FAISS Indexing -->
+        <div class="step-item fade-in-left">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>FAISS Vector Indexing & Persistence</h3>
+            <p>Vectors are indexed in FAISS for sub-millisecond similarity search, with automatic persistence to disk for durability across server restarts.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span class="code-filename">faiss_utils.py</span>
+              </div>
+              <div class="code-body">
+<pre><span class="cm"># Create or merge into existing FAISS index</span>
+<span class="cls">new_vs</span> <span class="op">=</span> <span class="fn">FAISS.from_documents</span>(chunks, embedding_function)
+<span class="cls">existing</span> <span class="op">=</span> <span class="fn">_get_vectorstore</span>()
+<span class="kw">if</span> existing:
+    existing.<span class="fn">merge_from</span>(new_vs)
+    <span class="fn">_save_vectorstore</span>(existing)
+<span class="kw">else</span>:
+    <span class="fn">_save_vectorstore</span>(new_vs)</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: RAG Pipeline -->
+        <div class="step-item fade-in-right">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>History-Aware RAG Pipeline</h3>
+            <p>Queries are contextualized using chat history, then the retriever fetches the most relevant chunks, and the LLM generates a grounded answer.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-dots"><span></span><span></span><span></span></div>
+                <span class="code-filename">langchain_utils.py</span>
+              </div>
+              <div class="code-body">
+<pre><span class="cm"># History-aware retriever + RAG chain</span>
+<span class="cls">history_retriever</span> <span class="op">=</span> <span class="fn">create_history_aware_retriever</span>(
+    llm, retriever, contextualize_q_prompt
+)
+<span class="cls">qa_chain</span> <span class="op">=</span> <span class="fn">create_stuff_documents_chain</span>(llm, qa_prompt)
+<span class="cls">rag_chain</span> <span class="op">=</span> <span class="fn">create_retrieval_chain</span>(
+    history_retriever, qa_chain
+)</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== METRICS ==================== -->
+  <section class="section metrics" id="metrics">
+    <div class="container text-center">
+      <h2 class="section-title fade-in">Performance <span class="gradient-text">Metrics</span></h2>
+      <p class="section-subtitle fade-in">
+        Quantified improvements through optimized chunking and vector search strategies
+      </p>
+      <div class="metrics-grid stagger-children" id="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value gradient-text" data-target="30" data-prefix="~" data-suffix="%">0%</div>
+          <div class="metric-label">Retrieval Improvement</div>
+          <div class="metric-detail">vs. naive chunking</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value gradient-text" data-target="384" data-suffix="d">0</div>
+          <div class="metric-label">Embedding Dimensions</div>
+          <div class="metric-detail">all-MiniLM-L6-v2</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value gradient-text" data-target="500" data-suffix="">0</div>
+          <div class="metric-label">Optimal Chunk Size</div>
+          <div class="metric-detail">tokens per chunk</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value gradient-text" data-target="4" data-suffix="">0</div>
+          <div class="metric-label">Supported Formats</div>
+          <div class="metric-detail">PDF, DOCX, HTML, TXT</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== LIVE DEMO ==================== -->
+  <section class="section" id="demo">
+    <div class="container text-center">
+      <h2 class="section-title fade-in">Live <span class="gradient-text">Demo</span></h2>
+      <p class="section-subtitle fade-in">
+        See the RAG pipeline in action with a simulated document Q&A conversation
+      </p>
+    </div>
+    <div class="container">
+      <div class="demo-container fade-in" id="demo-chat">
+        <div class="demo-header">
+          <div class="demo-header-left">
+            <div class="demo-avatar">🔍</div>
+            <div>
+              <div class="demo-title">RAG Document QA</div>
+              <div class="demo-status"><span class="dot"></span> Online</div>
+            </div>
+          </div>
+          <span class="demo-model-badge">Flan-T5-Large</span>
+        </div>
+        <div class="demo-messages" id="demo-messages">
+          <!-- Messages are injected by JS -->
+        </div>
+        <div class="demo-input">
+          <input type="text" id="demo-input-field" placeholder="Ask a question about the uploaded document..." />
+          <button id="demo-send-btn" aria-label="Send message">➤</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PROJECT STRUCTURE ==================== -->
+  <section class="section project-structure" id="project-structure">
+    <div class="container text-center">
+      <h2 class="section-title fade-in">Project <span class="gradient-text">Structure</span></h2>
+      <p class="section-subtitle fade-in">
+        Clean, modular architecture separating backend API, frontend UI, and documentation
+      </p>
+    </div>
+    <div class="container">
+      <div class="file-tree fade-in">
+        <div class="file-tree-header">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-filename">RAG-DOCUMENT-QA/</span>
+        </div>
+        <div class="file-tree-body">
+          <div class="tree-item"><span class="icon">📁</span> api/ <span class="desc">FastAPI Backend</span></div>
+          <div class="tree-item indent-1"><span class="icon">🐍</span> main.py <span class="desc">Entry point & API routes</span></div>
+          <div class="tree-item indent-1"><span class="icon">🐍</span> faiss_utils.py <span class="desc">FAISS + HuggingFace embeddings</span></div>
+          <div class="tree-item indent-1"><span class="icon">🐍</span> langchain_utils.py <span class="desc">RAG pipeline & LLM config</span></div>
+          <div class="tree-item indent-1"><span class="icon">🐍</span> pydantic_models.py <span class="desc">Request/response schemas</span></div>
+          <div class="tree-item indent-1"><span class="icon">🐍</span> db_utils.py <span class="desc">SQLite chat history</span></div>
+          <div class="tree-item"><span class="icon">📁</span> app/ <span class="desc">Streamlit Frontend</span></div>
+          <div class="tree-item indent-1"><span class="icon">🐍</span> streamlit_app.py <span class="desc">Main Streamlit application</span></div>
+          <div class="tree-item indent-1"><span class="icon">🐍</span> chat_interface.py <span class="desc">Chat UI component</span></div>
+          <div class="tree-item indent-1"><span class="icon">🐍</span> sidebar.py <span class="desc">Model selection & settings</span></div>
+          <div class="tree-item indent-1"><span class="icon">🐍</span> api_utils.py <span class="desc">FastAPI client utilities</span></div>
+          <div class="tree-item"><span class="icon">📁</span> docs/ <span class="desc">Sample documents</span></div>
+          <div class="tree-item"><span class="icon">📁</span> documentation/ <span class="desc">Guides & reference</span></div>
+          <div class="tree-item"><span class="icon">⚙️</span> .env.example <span class="desc">Environment template</span></div>
+          <div class="tree-item"><span class="icon">📋</span> requirements.txt <span class="desc">Python dependencies</span></div>
+          <div class="tree-item"><span class="icon">📝</span> README.md <span class="desc">Project documentation</span></div>
+          <div class="tree-item"><span class="icon">📜</span> LICENSE <span class="desc">MIT License</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <a href="#" class="nav-logo">
+          <span class="nav-logo-icon">🔍</span>
+          <span>RAG <span class="gradient-text">QA</span> System</span>
+        </a>
+        <div class="footer-links">
+          <a href="#architecture">Architecture</a>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#demo">Demo</a>
+          <a href="https://github.com/Devansh1909/conversational-rag-chatbot" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="footer-badge">📜 MIT License</div>
+        <p class="footer-copy">
+          Built with LangChain, FAISS & HuggingFace · © 2024 Devansh
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

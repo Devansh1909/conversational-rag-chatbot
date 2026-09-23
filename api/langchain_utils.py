@@ -4,9 +4,13 @@ load_dotenv()
 
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.chains import create_history_aware_retriever, create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.documents import Document
+try:
+    from langchain.chains import create_history_aware_retriever, create_retrieval_chain
+    from langchain.chains.combine_documents import create_stuff_documents_chain
+except ImportError:
+    from langchain_classic.chains import create_history_aware_retriever, create_retrieval_chain
+    from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from typing import List
 import os
 import logging
@@ -35,14 +39,18 @@ contextualize_q_prompt = ChatPromptTemplate.from_messages([
     ("human", "{input}"),
 ])
 
-# QA prompt: Instructs the LLM to answer based on retrieved document context
+# QA prompt: Instructs the LLM to answer strictly based on retrieved document context
 qa_prompt = ChatPromptTemplate.from_messages([
     ("system", 
-     "You are a helpful AI assistant specialized in document question answering. "
-     "Use the following retrieved context to answer the user's question accurately. "
-     "If the answer is not found in the context, say so clearly. "
-     "Always provide concise, well-structured responses."),
-    ("system", "Context: {context}"),
+     "You are a strict document question answering assistant.\n\n"
+     "CRITICAL INSTRUCTIONS:\n"
+     "1. Answer the user's question relying ONLY and EXCLUSIVELY on the provided Context below.\n"
+     "2. Do NOT use any pre-existing, external, or real-world knowledge.\n"
+     "3. If the answer is NOT explicitly stated in or directly supported by the provided Context, you MUST answer with:\n"
+     "\"I don't know, there is no such thing given in these documents.\"\n"
+     "4. Never guess, assume, speculate, or bring in outside facts (such as world leaders, general facts, or external entities) if they are not in the Context.\n"
+     "5. Keep your response direct, factual, and strictly faithful to the provided text."),
+    ("system", "Context:\n{context}"),
     MessagesPlaceholder(variable_name="chat_history"),
     ("human", "{input}")
 ])
@@ -54,6 +62,7 @@ def _get_llm(model: str):
     Initialize and return the appropriate LLM based on the model name.
 
     Supports:
+        - Groq models (qwen/qwen3.8-27b, openai/gpt-oss-120b)
         - HuggingFace Hub models (google/flan-t5-large, mistralai/Mistral-7B-Instruct-v0.1)
         - OpenAI models as fallback (gpt-4o, gpt-4o-mini)
 
@@ -63,6 +72,20 @@ def _get_llm(model: str):
     Returns:
         A LangChain-compatible LLM instance
     """
+    groq_models = [
+        "qwen/qwen3.8-27b",
+        "openai/gpt-oss-120b"
+    ]
+
+    if model in groq_models or "qwen" in model.lower() or "gpt-oss" in model.lower():
+        groq_api_key = os.getenv("GROQ_API_KEY")
+        if groq_api_key:
+            from langchain_groq import ChatGroq
+            logger.info(f"Using Groq model: {model}")
+            return ChatGroq(model=model, groq_api_key=groq_api_key, temperature=0.0)
+        else:
+            logger.warning("GROQ_API_KEY not set.")
+
     huggingface_models = [
         "google/flan-t5-large",
         "mistralai/Mistral-7B-Instruct-v0.1"
@@ -76,7 +99,7 @@ def _get_llm(model: str):
             return HuggingFaceEndpoint(
                 repo_id=model,
                 huggingfacehub_api_token=hf_token,
-                temperature=0.3,
+                temperature=0.01,
                 max_new_tokens=512
             )
         else:
@@ -86,7 +109,7 @@ def _get_llm(model: str):
     # OpenAI fallback
     from langchain_openai import ChatOpenAI
     logger.info(f"Using OpenAI model: {model}")
-    return ChatOpenAI(model=model)
+    return ChatOpenAI(model=model, temperature=0.0)
 
 
 

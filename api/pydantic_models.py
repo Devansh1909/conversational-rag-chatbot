@@ -11,14 +11,20 @@ class ModelName(str, Enum):
     """
     Supported LLM models for the RAG pipeline.
     
-    HuggingFace Models (Primary):
-        - FLAN_T5: Google's Flan-T5-Large — instruction-tuned text-to-text model
-        - MISTRAL: Mistral-7B-Instruct — high-quality open-source LLM
+    Groq Models (Ultra-fast):
+        - GROQ_QWEN: Qwen 3.8-27B
+        - GROQ_GPT_OSS: OpenAI GPT-OSS-120B
     
-    OpenAI Models (Fallback):
-        - GPT4_O_MINI: GPT-4o-mini — cost-effective OpenAI model
-        - GPT4_O: GPT-4o — high-capability OpenAI model
+    HuggingFace Models:
+        - FLAN_T5: Google's Flan-T5-Large
+        - MISTRAL: Mistral-7B-Instruct
+    
+    OpenAI Models:
+        - GPT4_O_MINI: GPT-4o-mini
+        - GPT4_O: GPT-4o
     """
+    GROQ_QWEN = "qwen/qwen3.8-27b"
+    GROQ_GPT_OSS = "openai/gpt-oss-120b"
     FLAN_T5 = "google/flan-t5-large"
     MISTRAL = "mistralai/Mistral-7B-Instruct-v0.1"
     GPT4_O_MINI = "gpt-4o-mini"
@@ -29,7 +35,7 @@ class QueryInput(BaseModel):
     """Schema for incoming chat queries."""
     question: str
     session_id: str = Field(default=None)
-    model: ModelName = Field(default=ModelName.FLAN_T5)
+    model: ModelName = Field(default=ModelName.GROQ_QWEN)
 
 
 class QueryResponse(BaseModel):
